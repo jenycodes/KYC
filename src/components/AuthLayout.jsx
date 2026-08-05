@@ -28,7 +28,7 @@ function AuthLayout({ eyebrow, title, subtitle, children, footer }) {
               />
             </svg>
           </div>
-          <span className="auth__wordmark">KYC Verify</span>
+          <span className="auth__wordmark">Secure KYC</span>
         </div>
 
         <div className="auth__brand-body">
@@ -38,9 +38,9 @@ function AuthLayout({ eyebrow, title, subtitle, children, footer }) {
             checked and cleared.
           </h1>
           <p className="auth__sub">
-            One workspace for document capture, OCR extraction, and reviewer
-            sign-off — built for compliance teams who move fast without
-            cutting corners.
+            One verification hub for document capture, OCR extraction, and
+            reviewer sign-off — built for compliance teams who move fast
+            without cutting corners.
           </p>
           <ScanIllustration />
         </div>

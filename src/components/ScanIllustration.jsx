@@ -37,7 +37,7 @@ function ScanIllustration() {
         </div>
 
         <div className="scan__mrz">
-          <span>KYC&lt;&lt;VERIFICATION&lt;&lt;SYSTEM&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span>
+          <span>SECUREKYC&lt;&lt;VERIFICATION&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span>
           <span>0042871639KYC9911048F3108117&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;12</span>
         </div>
 

@@ -43,11 +43,11 @@ function LoginPage() {
   return (
     <AuthLayout
       eyebrow="Reviewer access"
-      title="Log in to your workspace"
+      title="Log in to your verification console"
       subtitle="Enter your credentials to continue verifying customer identities."
       footer={
         <>
-          New to KYC Verify? <Link to="/register" className="form__link">Create an account</Link>
+          New to Secure KYC? <Link to="/register" className="form__link">Create an account</Link>
         </>
       }
     >

@@ -1,4 +1,4 @@
-# KYC Verify — Auth UI
+# Secure KYC — Auth UI
 
 Responsive login and registration screens for the KYC Verification System,
 built with React 19 + Vite and React Router.
