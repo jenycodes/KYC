@@ -1,0 +1,249 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-700);
+}
+
+.field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field__input {
+  width: 100%;
+  padding: 11px 13px;
+  font-size: 14.5px;
+  color: var(--ink-900);
+  background: var(--paper-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field__control .field__input {
+  padding-right: 42px;
+}
+
+.field__input::placeholder {
+  color: var(--ink-300);
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: var(--blue-600);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+.field__input--error {
+  border-color: var(--red-600);
+}
+
+.field__input--error:focus {
+  box-shadow: 0 0 0 4px rgba(217, 83, 79, 0.18);
+}
+
+.field__toggle {
+  position: absolute;
+  right: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--ink-500);
+  cursor: pointer;
+}
+
+.field__toggle:hover {
+  color: var(--ink-700);
+  background: var(--paper-100);
+}
+
+.field__error {
+  font-size: 12.5px;
+  color: var(--red-600);
+  margin: 0;
+}
+
+/* Password strength meter */
+.strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.strength__bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.strength__bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+
+.strength__label {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 62px;
+  text-align: right;
+}
+
+/* Row helpers */
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form__between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13.5px;
+}
+
+.form__link {
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.form__link:hover {
+  text-decoration: underline;
+}
+
+/* Checkbox */
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13.5px;
+  color: var(--ink-700);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--navy-900);
+  cursor: pointer;
+}
+
+/* Submit button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14.5px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.btn--primary {
+  background: var(--navy-900);
+  color: var(--paper-0);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--navy-800);
+}
+
+.btn--primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btn__spinner {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: var(--paper-0);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-300);
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Alert banner (top-level form errors / success) */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.alert--error {
+  background: var(--red-100);
+  color: #9a3a37;
+  border: 1px solid rgba(217, 83, 79, 0.25);
+}
+
+.alert--success {
+  background: var(--green-100);
+  color: #1f6e4a;
+  border: 1px solid rgba(46, 158, 107, 0.28);
+}
+
+@media (max-width: 420px) {
+  .form__row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,100 @@
+/* ============================================================
+   Design tokens — KYC Verification System auth experience
+   ============================================================ */
+:root {
+  /* Brand palette (aligned with the KYC system's document colour set) */
+  --navy-900: #1f2a36;
+  --navy-800: #263444;
+  --navy-700: #303f52;
+  --blue-600: #3b82c4;
+  --blue-500: #549bd8;
+  --blue-100: #e6f0f9;
+  --green-600: #2e9e6b;
+  --green-100: #e5f5ee;
+  --red-600: #d9534f;
+  --red-100: #fceeed;
+
+  --ink-900: #16202a;
+  --ink-700: #3d4a58;
+  --ink-500: #6b7686;
+  --ink-300: #a4adb8;
+
+  --paper-0: #ffffff;
+  --paper-50: #f7f8fa;
+  --paper-100: #eef1f4;
+  --border: #dfe4e9;
+  --focus-ring: rgba(59, 130, 196, 0.35);
+
+  /* Type */
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body: "Inter", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+
+  /* Layout */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-card: 0 20px 45px -20px rgba(31, 42, 54, 0.35);
+  --shadow-soft: 0 1px 2px rgba(22, 32, 42, 0.06);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink-900);
+  background: var(--paper-50);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--blue-600);
+}
+
+button {
+  font-family: inherit;
+}
+
+input {
+  font-family: var(--font-body);
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--blue-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
