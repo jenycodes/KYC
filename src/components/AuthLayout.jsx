@@ -39,7 +39,7 @@ function AuthLayout({ eyebrow, title, subtitle, children, footer }) {
           </h1>
           <p className="auth__sub">
             One verification hub for document capture, OCR extraction, and
-            reviewer sign-off — built for compliance teams who move fast
+            reviewer sign-off, built for compliance teams who move fast
             without cutting corners.
           </p>
           <ScanIllustration />
