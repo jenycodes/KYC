@@ -25,13 +25,13 @@ built with React 19 + Vite and React Router.
 
 ## Getting started
 
-\`\`\`bash
+```bash
 npm install
 npm run dev       # start the dev server
 npm run build      # production build -> dist/
 npm run preview    # preview the production build
 npm run lint        # oxlint
-\`\`\`
+```
 
 ## Wiring up the backend
 
@@ -39,10 +39,10 @@ Both forms currently simulate the network call (see the TODO comments in
 src/pages/LoginPage.jsx and src/pages/RegisterPage.jsx). Point them at
 the Spring Boot / Spring Security JWT endpoints, e.g.:
 
-\`\`\`
+```
 POST /api/auth/login      { email, password }        -> { token }
 POST /api/auth/register   { fullName, email, employeeId, password }
-\`\`\`
+```
 
 Store the returned JWT (e.g. in memory + an httpOnly refresh cookie, or
 sessionStorage if that fits the existing architecture doc) and redirect to
@@ -50,7 +50,7 @@ the dashboard route on success.
 
 ## Folder structure
 
-\`\`\`
+```
 src/
   components/
     AuthLayout.jsx / .css   shared split-screen shell
@@ -64,4 +64,4 @@ src/
     forms.css               shared field/button/alert styles
   utils/
     validators.js
-\`\`\`
+```
