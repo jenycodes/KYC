@@ -11,6 +11,11 @@ built with React 19 + Vite and React Router.
   strength meter, confirm-password check, policy acknowledgement checkbox.
 - Shared split-screen `AuthLayout` with a brand panel (animated document-scan
   illustration) that collapses to a compact header on narrow viewports.
+- `/verify` — the screen a reviewer lands on after logging in: upload the
+  government ID and proof of address, watch OCR extraction run, review and
+  correct the extracted fields (each flagged with a confidence level), then
+  approve, reject, or request more information. Login redirects here
+  automatically on success.
 - `preview.html` — a dependency-free static copy of the same design (open it
   directly in a browser) if you just want to look at the UI without running
   the dev server.
@@ -57,11 +62,21 @@ src/
     ScanIllustration.jsx    signature animated illustration
     FormField.jsx           labeled text input
     PasswordField.jsx       password input + show/hide + strength meter
+    verification/
+      CaseHeader.jsx        sticky top bar: case ref, customer, status pill
+      Stepper.jsx           4-step progress indicator
+      UploadDropzone.jsx    single drag-and-drop file slot
+      UploadStep.jsx        ID + address upload cards
+      ProcessingStep.jsx    OCR "in progress" state
+      ReviewStep.jsx        document preview + editable extracted fields
+      DecisionStep.jsx      approve / reject / request-info + notes
   pages/
     LoginPage.jsx
     RegisterPage.jsx
+    VerificationPage.jsx    orchestrates the /verify step flow
   styles/
-    forms.css               shared field/button/alert styles
+    forms.css               shared field/button/alert styles (auth pages)
+    verification.css        shared styles for the verification page
   utils/
     validators.js
 ```
