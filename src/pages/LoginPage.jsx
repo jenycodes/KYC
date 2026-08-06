@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout.jsx";
 import FormField from "../components/FormField.jsx";
 import PasswordField from "../components/PasswordField.jsx";
@@ -9,6 +9,7 @@ import "../styles/forms.css";
 const INITIAL = { email: "", password: "" };
 
 function LoginPage() {
+  const navigate = useNavigate();
   const [values, setValues] = useState(INITIAL);
   const [errors, setErrors] = useState({});
   const [remember, setRemember] = useState(true);
@@ -38,6 +39,7 @@ function LoginPage() {
     // TODO: replace with POST /api/auth/login against the Spring Security / JWT backend.
     await new Promise((resolve) => setTimeout(resolve, 900));
     setStatus("success");
+    setTimeout(() => navigate("/verify"), 900);
   }
 
   return (
