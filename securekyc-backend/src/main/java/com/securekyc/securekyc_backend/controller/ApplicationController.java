@@ -5,7 +5,6 @@ import com.securekyc.securekyc_backend.dto.application.ApplicationResponse;
 import com.securekyc.securekyc_backend.dto.application.DecisionRequest;
 import com.securekyc.securekyc_backend.dto.application.DocumentUploadResponse;
 import com.securekyc.securekyc_backend.dto.application.VerificationCheckRequest;
-import com.securekyc.securekyc_backend.dto.application.VerificationCheckResponse;
 import com.securekyc.securekyc_backend.entity.KycApplication;
 import com.securekyc.securekyc_backend.entity.KycDocument;
 import com.securekyc.securekyc_backend.entity.User;
