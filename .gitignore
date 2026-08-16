@@ -1,0 +1,16 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.env
+.env.*
+!.env.example
+securekyc-backend/.env
+securekyc-backend/uploads/
+securekyc-backend/.db-creds.txt
+securekyc-backend/UsersJenishaJAppDataLocalTempmrz-lines.txt
+securekyc-backend/test-mysql-creds.bat
+Kyc Dashboard/
+Kyc Dashboard - zip file.zip
+npm-debug.log*

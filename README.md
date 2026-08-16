@@ -1,0 +1,67 @@
+# Secure KYC — Auth UI
+
+Responsive login and registration screens for the KYC Verification System,
+built with React 19 + Vite and React Router.
+
+## What's here
+
+- `/login` — email + password sign-in, "remember this device", forgot-password
+  link, inline validation, loading and success states.
+- `/register` — full name, work email, employee ID, password with a live
+  strength meter, confirm-password check, policy acknowledgement checkbox.
+- Shared split-screen `AuthLayout` with a brand panel (animated document-scan
+  illustration) that collapses to a compact header on narrow viewports.
+- `preview.html` — a dependency-free static copy of the same design (open it
+  directly in a browser) if you just want to look at the UI without running
+  the dev server.
+
+## Stack
+
+- React 19, React Router 7
+- Vite 8
+- Plain CSS with a small design-token system (`src/index.css`) — no UI
+  framework, so it's easy to re-skin to match the rest of the KYC document
+  set (navy `#1F2A36`, blue `#3B82C4`, green `#2E9E6B`, red `#D9534F`).
+
+## Getting started
+
+\`\`\`bash
+npm install
+npm run dev       # start the dev server
+npm run build      # production build -> dist/
+npm run preview    # preview the production build
+npm run lint        # oxlint
+\`\`\`
+
+## Wiring up the backend
+
+Both forms currently simulate the network call (see the TODO comments in
+src/pages/LoginPage.jsx and src/pages/RegisterPage.jsx). Point them at
+the Spring Boot / Spring Security JWT endpoints, e.g.:
+
+\`\`\`
+POST /api/auth/login      { email, password }        -> { token }
+POST /api/auth/register   { fullName, email, employeeId, password }
+\`\`\`
+
+Store the returned JWT (e.g. in memory + an httpOnly refresh cookie, or
+sessionStorage if that fits the existing architecture doc) and redirect to
+the dashboard route on success.
+
+## Folder structure
+
+\`\`\`
+src/
+  components/
+    AuthLayout.jsx / .css   shared split-screen shell
+    ScanIllustration.jsx    signature animated illustration
+    FormField.jsx           labeled text input
+    PasswordField.jsx       password input + show/hide + strength meter
+  pages/
+    LoginPage.jsx
+    RegisterPage.jsx
+  styles/
+    forms.css               shared field/button/alert styles
+  utils/
+    validators.js
+\`\`\`
