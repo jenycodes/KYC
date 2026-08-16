@@ -51,15 +51,23 @@ public class AuthService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Passwords do not match.");
         }
 
-        // Public sign-up is intentionally customer-only. Officers and admins must
-        // be provisioned by an administrator, preventing privilege escalation.
-        User.Role role = User.Role.CUSTOMER;
+        User.Role role = parseRole(request.getAccountType());
+        String employeeId = request.getEmployeeId() == null ? "" : request.getEmployeeId().trim();
+
+        if (role == User.Role.OFFICER) {
+            if (employeeId.isEmpty()) {
+                throw new ApiException(HttpStatus.BAD_REQUEST, "Reviewer ID is required for an officer account.");
+            }
+            if (userRepository.existsByEmployeeId(employeeId)) {
+                throw new ApiException(HttpStatus.CONFLICT, "Reviewer ID is already registered.");
+            }
+        }
 
         User user = new User();
 
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
-        user.setEmployeeId(null);
+        user.setEmployeeId(role == User.Role.OFFICER ? employeeId : null);
 
         user.setPassword(
                 passwordEncoder.encode(request.getPassword())
@@ -94,12 +102,26 @@ public class AuthService {
                     "This account has been deactivated. Please contact an administrator.");
         }
 
+        if (request.getAccountType() != null && !request.getAccountType().isBlank()
+                && user.getRole() != parseRole(request.getAccountType())) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "This account does not have the selected access type.");
+        }
+
         // Minting a new session id here is what enforces "one active session per
         // account": any token issued for a previous login stops matching as soon
         // as this save commits, and is rejected on its next request.
         user.setSessionId(UUID.randomUUID().toString());
 
         return userRepository.save(user);
+    }
+
+    private User.Role parseRole(String accountType) {
+        try {
+            return User.Role.valueOf((accountType == null || accountType.isBlank()
+                    ? "CUSTOMER" : accountType.trim().toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid account type.");
+        }
     }
 
     // =========================

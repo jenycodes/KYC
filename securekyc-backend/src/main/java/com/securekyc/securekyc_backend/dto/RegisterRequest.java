@@ -4,6 +4,8 @@ public class RegisterRequest {
 
     private String fullName;
     private String email;
+    private String employeeId;
+    private String accountType;
     private String password;
     private String confirmPassword;
 
@@ -24,6 +26,22 @@ public class RegisterRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 
     public String getPassword() {

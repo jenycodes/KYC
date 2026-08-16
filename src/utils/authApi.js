@@ -109,10 +109,10 @@ export async function apiFetchBlob(path) {
   return res.blob();
 }
 
-export async function registerUser({ fullName, email, password, confirmPassword }) {
+export async function registerUser({ fullName, email, password, confirmPassword, accountType, employeeId }) {
   const data = await request("/register", {
     method: "POST",
-    body: JSON.stringify({ fullName, email, password, confirmPassword }),
+    body: JSON.stringify({ fullName, email, password, confirmPassword, accountType, employeeId }),
   });
 
   return {
@@ -123,10 +123,10 @@ export async function registerUser({ fullName, email, password, confirmPassword 
   };
 }
 
-export async function loginWithPassword({ email, password }) {
+export async function loginWithPassword({ email, password, accountType }) {
   const data = await request("/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, accountType }),
   });
 
   return {

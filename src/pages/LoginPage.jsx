@@ -11,6 +11,7 @@ import { consumeSessionNotice } from "../utils/sessionNotice.js";
 import "../styles/forms.css";
 
 const INITIAL = {
+  accountType: "CUSTOMER",
   email: "",
   password: "",
 };
@@ -38,6 +39,10 @@ function LoginPage() {
         }));
       }
     };
+  }
+
+  function selectAccountType(accountType) {
+    setValues((v) => ({ ...v, accountType }));
   }
 
   function validate() {
@@ -73,6 +78,7 @@ function LoginPage() {
       const data = await loginWithPassword({
         email: values.email,
         password: values.password,
+        accountType: values.accountType,
       });
 
       const user = loginUser({
@@ -120,6 +126,24 @@ function LoginPage() {
               {notice.message}
             </div>
           ) : null}
+
+          <div className="field">
+            <span className="field__label">Log in as</span>
+            <div className="segmented" role="radiogroup" aria-label="Account type">
+              {[["CUSTOMER", "Customer"], ["OFFICER", "KYC Officer"], ["ADMIN", "Admin"]].map(([type, label]) => (
+                <button
+                  key={type}
+                  type="button"
+                  role="radio"
+                  aria-checked={values.accountType === type}
+                  className={`segmented__option${values.accountType === type ? " segmented__option--active" : ""}`}
+                  onClick={() => selectAccountType(type)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           {status === "error" ? (
             <div className="alert alert--error" role="alert">
               {errors.form || "We couldn't sign you in. Please try again."}

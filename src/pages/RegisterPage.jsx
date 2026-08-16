@@ -4,14 +4,16 @@ import AuthLayout from "../components/AuthLayout.jsx";
 import AlreadySignedIn from "../components/AlreadySignedIn.jsx";
 import FormField from "../components/FormField.jsx";
 import PasswordField from "../components/PasswordField.jsx";
-import { isStrongEnough, isValidEmail, isValidFullName } from "../utils/validators.js";
+import { isStrongEnough, isValidEmail, isValidFullName, isValidReviewerId } from "../utils/validators.js";
 import { getCurrentUser, homePathForRole, isAuthenticated, loginUser } from "../utils/caseStore.js";
 import { registerUser } from "../utils/authApi.js";
 import "../styles/forms.css";
 
 const INITIAL = {
+  accountType: "CUSTOMER",
   fullName: "",
   email: "",
+  employeeId: "",
   password: "",
   confirmPassword: "",
   agree: false,
@@ -42,8 +44,14 @@ function RegisterPage() {
     };
   }
 
+  function selectAccountType(accountType) {
+    setValues((v) => ({ ...v, accountType, employeeId: "" }));
+    setErrors((er) => ({ ...er, employeeId: undefined }));
+  }
+
   function validate() {
     const next = {};
+    const isOfficer = values.accountType === "OFFICER";
 
     if (!values.fullName.trim()) {
       next.fullName = "Enter your full name.";
@@ -57,6 +65,14 @@ function RegisterPage() {
     } else if (!isValidEmail(values.email)) {
       next.email =
         "Use a valid email ending in gmail.com, outlook.com, or yahoo.com.";
+    }
+
+    if (isOfficer) {
+      if (!values.employeeId.trim()) {
+        next.employeeId = "Enter your reviewer ID.";
+      } else if (!isValidReviewerId(values.employeeId)) {
+        next.employeeId = "Use format like REV-1049 or ABC-12345.";
+      }
     }
 
     if (!values.password) {
@@ -95,6 +111,8 @@ function RegisterPage() {
       const data = await registerUser({
         fullName: values.fullName,
         email: values.email,
+        accountType: values.accountType,
+        employeeId: values.accountType === "OFFICER" ? values.employeeId : undefined,
         password: values.password,
         confirmPassword: values.confirmPassword,
       });
@@ -153,6 +171,24 @@ function RegisterPage() {
             </div>
           ) : null}
 
+          <div className="field">
+            <span className="field__label">Create account as</span>
+            <div className="segmented" role="radiogroup" aria-label="Account type">
+              {[["CUSTOMER", "Customer"], ["OFFICER", "KYC Officer"], ["ADMIN", "Admin"]].map(([type, label]) => (
+                <button
+                  key={type}
+                  type="button"
+                  role="radio"
+                  aria-checked={values.accountType === type}
+                  className={`segmented__option${values.accountType === type ? " segmented__option--active" : ""}`}
+                  onClick={() => selectAccountType(type)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <FormField
             id="fullName"
             label="Full name"
@@ -163,16 +199,30 @@ function RegisterPage() {
             required
           />
 
-          <FormField
-            id="email"
-            label="Work email"
-            type="email"
-            placeholder=""
-            value={values.email}
-            onChange={update("email")}
-            error={errors.email}
-            required
-          />
+          <div className="form__row">
+            <FormField
+              id="email"
+              label="Work email"
+              type="email"
+              placeholder=""
+              value={values.email}
+              onChange={update("email")}
+              error={errors.email}
+              required
+            />
+
+            {values.accountType === "OFFICER" ? (
+              <FormField
+                id="employeeId"
+                label="Reviewer ID"
+                placeholder=""
+                value={values.employeeId}
+                onChange={update("employeeId")}
+                error={errors.employeeId}
+                required
+              />
+            ) : null}
+          </div>
 
           <PasswordField
             id="password"

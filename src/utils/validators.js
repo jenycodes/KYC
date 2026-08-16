@@ -45,3 +45,7 @@ export function isValidFullName(value) {
   if (!/^[A-Za-z]+(?: [A-Za-z]+)*$/.test(trimmed)) return false;
   return trimmed.split(" ").every((part) => part.length >= 2);
 }
+
+export function isValidReviewerId(value) {
+  return /^[A-Z]{2,4}-\d{3,6}$/.test(value.trim());
+}
