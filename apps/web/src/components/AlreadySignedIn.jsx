@@ -1,18 +1,20 @@
-import { useNavigate } from "react-router-dom";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { homePathForRole, logoutUser } from "../utils/caseStore.js";
 import { logout as logoutOnServer } from "../utils/authApi.js";
 
 function AlreadySignedIn({ user }) {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   function handleContinue() {
-    navigate(homePathForRole(user.role), { replace: true });
+    router.replace(homePathForRole(user.role));
   }
 
   function handleSwitchAccount() {
     logoutOnServer().catch(() => {});
     logoutUser();
-    navigate(0);
+    window.location.reload();
   }
 
   return (

@@ -1,13 +1,16 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import AuthLayout from "../components/AuthLayout.jsx";
-import AlreadySignedIn from "../components/AlreadySignedIn.jsx";
-import FormField from "../components/FormField.jsx";
-import PasswordField from "../components/PasswordField.jsx";
-import { isStrongEnough, isValidEmail, isValidFullName, isValidReviewerId } from "../utils/validators.js";
-import { getCurrentUser, homePathForRole, isAuthenticated, loginUser } from "../utils/caseStore.js";
-import { registerUser } from "../utils/authApi.js";
-import "../styles/forms.css";
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import AuthLayout from "../../../components/AuthLayout.jsx";
+import AlreadySignedIn from "../../../components/AlreadySignedIn.jsx";
+import FormField from "../../../components/FormField.jsx";
+import PasswordField from "../../../components/PasswordField.jsx";
+import { isStrongEnough, isValidEmail, isValidFullName, isValidReviewerId } from "../../../utils/validators.js";
+import { getCurrentUser, homePathForRole, isAuthenticated, loginUser } from "../../../utils/caseStore.js";
+import { registerUser } from "../../../utils/authApi.js";
+import "../../../styles/forms.css";
 
 const INITIAL = {
   accountType: "CUSTOMER",
@@ -20,11 +23,15 @@ const INITIAL = {
 };
 
 function RegisterPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [values, setValues] = useState(INITIAL);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle");
-  const alreadySignedInUser = isAuthenticated() ? getCurrentUser() : null;
+  const [alreadySignedInUser, setAlreadySignedInUser] = useState(null);
+
+  useEffect(() => {
+    setAlreadySignedInUser(isAuthenticated() ? getCurrentUser() : null);
+  }, []);
 
   function update(field, isCheckbox = false) {
     return (e) => {
@@ -124,7 +131,7 @@ function RegisterPage() {
         token: data.token,
       });
       setStatus("success");
-      navigate(homePathForRole(user.role), { replace: true });
+      router.replace(homePathForRole(user.role));
     } catch (error) {
       setErrors((er) => ({
         ...er,
@@ -143,7 +150,7 @@ function RegisterPage() {
       footer={
         <>
           Already registered?{" "}
-          <Link to="/login" className="form__link">
+          <Link href="/login" className="form__link">
             Log in
           </Link>
         </>
@@ -163,7 +170,7 @@ function RegisterPage() {
               {errors.form?.toLowerCase().includes("already registered") ? (
                 <>
                   {" "}
-                  <Link to="/login" className="form__link">
+                  <Link href="/login" className="form__link">
                     Log in instead
                   </Link>
                 </>
@@ -261,7 +268,7 @@ function RegisterPage() {
           </div>
 
           <div className="field">
-            <Link to="/forgot-password" className="form__link form__link--inline">
+            <Link href="/forgot-password" className="form__link form__link--inline">
               Forgot password?
             </Link>
           </div>

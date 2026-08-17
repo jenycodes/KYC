@@ -1,18 +1,21 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/dashboard/Sidebar.jsx";
-import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
-import DashboardOverview from "../components/dashboard/DashboardOverview.jsx";
-import DashboardStats from "../components/dashboard/DashboardStats.jsx";
-import CaseList from "../components/dashboard/CaseList.jsx";
-import AuditLog from "../components/dashboard/AuditLog.jsx";
-import CompliancePanel from "../components/dashboard/CompliancePanel.jsx";
-import DocumentReviewPanel from "../components/dashboard/DocumentReviewPanel.jsx";
-import VerificationChecklist from "../components/dashboard/VerificationChecklist.jsx";
-import AdminUsersPanel from "../components/dashboard/AdminUsersPanel.jsx";
-import DecisionStep from "../components/verification/DecisionStep.jsx";
-import { logout as logoutOnServer } from "../utils/authApi.js";
-import { getCurrentUser, logoutUser } from "../utils/caseStore.js";
+import { useRouter } from "next/navigation";
+import RoleProtectedRoute from "../../../components/RoleProtectedRoute.jsx";
+import Sidebar from "../../../components/dashboard/Sidebar.jsx";
+import DashboardHeader from "../../../components/dashboard/DashboardHeader.jsx";
+import DashboardOverview from "../../../components/dashboard/DashboardOverview.jsx";
+import DashboardStats from "../../../components/dashboard/DashboardStats.jsx";
+import CaseList from "../../../components/dashboard/CaseList.jsx";
+import AuditLog from "../../../components/dashboard/AuditLog.jsx";
+import CompliancePanel from "../../../components/dashboard/CompliancePanel.jsx";
+import DocumentReviewPanel from "../../../components/dashboard/DocumentReviewPanel.jsx";
+import VerificationChecklist from "../../../components/dashboard/VerificationChecklist.jsx";
+import AdminUsersPanel from "../../../components/dashboard/AdminUsersPanel.jsx";
+import DecisionStep from "../../../components/verification/DecisionStep.jsx";
+import { logout as logoutOnServer } from "../../../utils/authApi.js";
+import { getCurrentUser, logoutUser } from "../../../utils/caseStore.js";
 import {
   decideApplication,
   fetchAdminStats,
@@ -24,11 +27,11 @@ import {
   listOfficers,
   reassignApplication,
   recordVerificationCheck,
-} from "../utils/applicationApi.js";
-import { fieldsFromApplication } from "../utils/applicationFields.js";
-import "../styles/forms.css";
-import "../styles/verification.css";
-import "../styles/dashboard.css";
+} from "../../../utils/applicationApi.js";
+import { fieldsFromApplication } from "../../../utils/applicationFields.js";
+import "../../../styles/forms.css";
+import "../../../styles/verification.css";
+import "../../../styles/dashboard.css";
 
 const SLOT_TO_DOCUMENT_TYPE = { idFront: "GOVERNMENT_ID", idBack: "SUPPORTING", address: "ADDRESS_PROOF" };
 
@@ -77,7 +80,7 @@ function filterCases(cases, query) {
 }
 
 function ReviewerDashboardPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const user = getCurrentUser();
   const isAdmin = user?.role === "ADMIN";
 
@@ -203,7 +206,7 @@ function ReviewerDashboardPage() {
   function handleLogout() {
     logoutOnServer().catch(() => {});
     logoutUser();
-    navigate("/login", { replace: true });
+    router.replace("/login");
   }
 
   const cases = useMemo(() => applications.map(toCaseShape), [applications]);
@@ -413,4 +416,10 @@ function ReviewerDashboardPage() {
   );
 }
 
-export default ReviewerDashboardPage;
+export default function Page() {
+  return (
+    <RoleProtectedRoute allowedRoles={["ADMIN", "OFFICER"]}>
+      <ReviewerDashboardPage />
+    </RoleProtectedRoute>
+  );
+}

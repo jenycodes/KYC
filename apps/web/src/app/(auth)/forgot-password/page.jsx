@@ -1,17 +1,20 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import AuthLayout from "../components/AuthLayout.jsx";
-import FormField from "../components/FormField.jsx";
-import { isValidLoginEmail } from "../utils/validators.js";
-import { forgotPassword } from "../utils/authApi.js";
-import "../styles/forms.css";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import AuthLayout from "../../../components/AuthLayout.jsx";
+import FormField from "../../../components/FormField.jsx";
+import { isValidLoginEmail } from "../../../utils/validators.js";
+import { forgotPassword } from "../../../utils/authApi.js";
+import "../../../styles/forms.css";
 
 const INITIAL = {
   email: "",
 };
 
 function ForgotPasswordPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [values, setValues] = useState(INITIAL);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle");
@@ -61,7 +64,7 @@ function ForgotPasswordPage() {
       footer={
         <>
           Remembered your password?{" "}
-          <Link to="/login" className="form__link">
+          <Link href="/login" className="form__link">
             Back to log in
           </Link>
         </>
@@ -76,7 +79,7 @@ function ForgotPasswordPage() {
           <button
             type="button"
             className="btn btn--secondary"
-            onClick={() => navigate("/login")}
+            onClick={() => router.push("/login")}
           >
             Return to sign in
           </button>
@@ -123,7 +126,7 @@ function ForgotPasswordPage() {
           <button
             type="button"
             className="btn btn--secondary"
-            onClick={() => navigate("/login")}
+            onClick={() => router.push("/login")}
           >
             Return to sign in
           </button>

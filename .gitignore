@@ -4,6 +4,8 @@ node_modules/
 # Next.js (apps/web)
 .next/
 out/
+next-env.d.ts
+.vercel
 
 # Vite (legacy, during migration)
 dist/

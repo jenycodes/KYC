@@ -1,16 +1,19 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/dashboard/Sidebar.jsx";
-import DashboardHeader from "../components/dashboard/DashboardHeader.jsx";
-import DashboardOverview from "../components/dashboard/DashboardOverview.jsx";
-import DashboardStats from "../components/dashboard/DashboardStats.jsx";
-import CaseList from "../components/dashboard/CaseList.jsx";
-import CompliancePanel from "../components/dashboard/CompliancePanel.jsx";
-import ProcessingIndicator from "../components/dashboard/ProcessingIndicator.jsx";
-import DocumentReviewPanel from "../components/dashboard/DocumentReviewPanel.jsx";
-import UploadStep from "../components/verification/UploadStep.jsx";
-import { logout as logoutOnServer } from "../utils/authApi.js";
-import { getCurrentUser, logoutUser } from "../utils/caseStore.js";
+import { useRouter } from "next/navigation";
+import RoleProtectedRoute from "../../../components/RoleProtectedRoute.jsx";
+import Sidebar from "../../../components/dashboard/Sidebar.jsx";
+import DashboardHeader from "../../../components/dashboard/DashboardHeader.jsx";
+import DashboardOverview from "../../../components/dashboard/DashboardOverview.jsx";
+import DashboardStats from "../../../components/dashboard/DashboardStats.jsx";
+import CaseList from "../../../components/dashboard/CaseList.jsx";
+import CompliancePanel from "../../../components/dashboard/CompliancePanel.jsx";
+import ProcessingIndicator from "../../../components/dashboard/ProcessingIndicator.jsx";
+import DocumentReviewPanel from "../../../components/dashboard/DocumentReviewPanel.jsx";
+import UploadStep from "../../../components/verification/UploadStep.jsx";
+import { logout as logoutOnServer } from "../../../utils/authApi.js";
+import { getCurrentUser, logoutUser } from "../../../utils/caseStore.js";
 import {
   createDraft,
   fetchDocumentPreviewUrl,
@@ -20,11 +23,11 @@ import {
   submitApplication,
   updateDraft,
   uploadDocument,
-} from "../utils/applicationApi.js";
-import { ALL_FIELD_DEFS, fieldsFromApplication, fieldsToRequestBody } from "../utils/applicationFields.js";
-import "../styles/forms.css";
-import "../styles/verification.css";
-import "../styles/dashboard.css";
+} from "../../../utils/applicationApi.js";
+import { ALL_FIELD_DEFS, fieldsFromApplication, fieldsToRequestBody } from "../../../utils/applicationFields.js";
+import "../../../styles/forms.css";
+import "../../../styles/verification.css";
+import "../../../styles/dashboard.css";
 
 const EMPTY_FILES = { idFront: null, idBack: null, address: null };
 const SLOT_TO_DOCUMENT_TYPE = { idFront: "GOVERNMENT_ID", idBack: "SUPPORTING", address: "ADDRESS_PROOF" };
@@ -74,7 +77,7 @@ function filterCases(cases, query) {
 }
 
 function CustomerDashboardPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const user = getCurrentUser();
 
   const [applications, setApplications] = useState([]);
@@ -263,7 +266,7 @@ function CustomerDashboardPage() {
   function handleLogout() {
     logoutOnServer().catch(() => {});
     logoutUser();
-    navigate("/login", { replace: true });
+    router.replace("/login");
   }
 
   const cases = useMemo(() => applications.map(toCaseShape), [applications]);
@@ -466,4 +469,10 @@ function CustomerDashboardPage() {
   );
 }
 
-export default CustomerDashboardPage;
+export default function Page() {
+  return (
+    <RoleProtectedRoute allowedRoles={["CUSTOMER"]}>
+      <CustomerDashboardPage />
+    </RoleProtectedRoute>
+  );
+}

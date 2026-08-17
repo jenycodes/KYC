@@ -1,14 +1,17 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import AuthLayout from "../components/AuthLayout.jsx";
-import AlreadySignedIn from "../components/AlreadySignedIn.jsx";
-import FormField from "../components/FormField.jsx";
-import PasswordField from "../components/PasswordField.jsx";
-import { isValidLoginEmail } from "../utils/validators.js";
-import { getCurrentUser, homePathForRole, isAuthenticated, loginUser } from "../utils/caseStore.js";
-import { loginWithPassword } from "../utils/authApi.js";
-import { consumeSessionNotice } from "../utils/sessionNotice.js";
-import "../styles/forms.css";
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import AuthLayout from "../../../components/AuthLayout.jsx";
+import AlreadySignedIn from "../../../components/AlreadySignedIn.jsx";
+import FormField from "../../../components/FormField.jsx";
+import PasswordField from "../../../components/PasswordField.jsx";
+import { isValidLoginEmail } from "../../../utils/validators.js";
+import { getCurrentUser, homePathForRole, isAuthenticated, loginUser } from "../../../utils/caseStore.js";
+import { loginWithPassword } from "../../../utils/authApi.js";
+import { consumeSessionNotice } from "../../../utils/sessionNotice.js";
+import "../../../styles/forms.css";
 
 const INITIAL = {
   accountType: "CUSTOMER",
@@ -17,13 +20,18 @@ const INITIAL = {
 };
 
 function LoginPage() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [values, setValues] = useState(INITIAL);
   const [errors, setErrors] = useState({});
   const [remember, setRemember] = useState(true);
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
-  const [notice] = useState(() => consumeSessionNotice());
-  const alreadySignedInUser = isAuthenticated() ? getCurrentUser() : null;
+  const [notice, setNotice] = useState(null);
+  const [alreadySignedInUser, setAlreadySignedInUser] = useState(null);
+
+  useEffect(() => {
+    setNotice(consumeSessionNotice());
+    setAlreadySignedInUser(isAuthenticated() ? getCurrentUser() : null);
+  }, []);
 
   function update(field) {
     return (e) => {
@@ -88,7 +96,7 @@ function LoginPage() {
         token: data.token,
       });
       setStatus("success");
-      navigate(homePathForRole(user.role), { replace: true });
+      router.replace(homePathForRole(user.role));
     } catch (error) {
       setErrors((er) => ({
         ...er,
@@ -107,7 +115,7 @@ function LoginPage() {
       footer={
         <>
           New to Secure KYC?{" "}
-          <Link to="/register" className="form__link">
+          <Link href="/register" className="form__link">
             Create an account
           </Link>
         </>
@@ -184,7 +192,7 @@ function LoginPage() {
               Remember this device
             </label>
 
-            <Link to="/forgot-password" className="form__link">
+            <Link href="/forgot-password" className="form__link">
               Forgot password?
             </Link>
           </div>

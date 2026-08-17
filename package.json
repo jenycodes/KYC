@@ -1,0 +1,8 @@
+{
+  "name": "securekyc",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

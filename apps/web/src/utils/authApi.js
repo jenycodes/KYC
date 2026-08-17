@@ -1,7 +1,7 @@
 import { getAuthToken, logoutUser } from "./caseStore.js";
 import { setSessionNotice } from "./sessionNotice.js";
 
-export const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8081/api/auth";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8081/api/auth";
 export const API_ROOT = API_BASE.replace(/\/auth\/?$/, "");
 
 async function parseJsonResponse(res) {

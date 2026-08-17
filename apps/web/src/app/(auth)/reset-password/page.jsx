@@ -1,24 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import AuthLayout from "../components/AuthLayout.jsx";
-import PasswordField from "../components/PasswordField.jsx";
-import { isStrongEnough } from "../utils/validators.js";
-import { resetPassword } from "../utils/authApi.js";
-import "../styles/forms.css";
+"use client";
+
+import { Suspense, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import AuthLayout from "../../../components/AuthLayout.jsx";
+import PasswordField from "../../../components/PasswordField.jsx";
+import { isStrongEnough } from "../../../utils/validators.js";
+import { resetPassword } from "../../../utils/authApi.js";
+import "../../../styles/forms.css";
 
 const INITIAL = {
   password: "",
   confirmPassword: "",
 };
 
-function useQuery() {
-  const { search } = useLocation();
-  return useMemo(() => new URLSearchParams(search), [search]);
-}
-
 function ResetPasswordPage() {
-  const navigate = useNavigate();
-  const query = useQuery();
+  const router = useRouter();
+  const query = useSearchParams();
   const token = useMemo(() => query.get("token") || "", [query]);
   const email = useMemo(() => query.get("email") || "", [query]);
 
@@ -85,7 +83,7 @@ function ResetPasswordPage() {
     try {
       await resetPassword({ token, password: values.password, confirmPassword: values.confirmPassword });
       setStatus("success");
-      setTimeout(() => navigate("/login"), 1500);
+      setTimeout(() => router.push("/login"), 1500);
     } catch (error) {
       setErrors((er) => ({
         ...er,
@@ -107,7 +105,7 @@ function ResetPasswordPage() {
       footer={
         <>
           Need to try again?{" "}
-          <Link to="/forgot-password" className="form__link">
+          <Link href="/forgot-password" className="form__link">
             Back to reset email
           </Link>
         </>
@@ -120,7 +118,7 @@ function ResetPasswordPage() {
       ) : !token ? (
         <div className="alert alert--error" role="alert">
           This reset link is missing or invalid. Please request a new one from the{" "}
-          <Link to="/forgot-password" className="form__link">
+          <Link href="/forgot-password" className="form__link">
             forgot password
           </Link>{" "}
           page.
@@ -172,7 +170,7 @@ function ResetPasswordPage() {
           </button>
 
           <div className="form__helper">
-            <Link to="/login" className="form__link">
+            <Link href="/login" className="form__link">
               Return to sign in
             </Link>
           </div>
@@ -182,4 +180,10 @@ function ResetPasswordPage() {
   );
 }
 
-export default ResetPasswordPage;
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordPage />
+    </Suspense>
+  );
+}
