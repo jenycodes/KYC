@@ -1,16 +1,39 @@
-node_modules
-dist
-dist-ssr
-*.local
-.DS_Store
+# Dependencies
+node_modules/
+
+# Next.js (apps/web)
+.next/
+out/
+
+# Vite (legacy, during migration)
+dist/
+dist-ssr/
+
+# Env files
 .env
 .env.*
 !.env.example
-securekyc-backend/.env
-securekyc-backend/uploads/
-securekyc-backend/.db-creds.txt
-securekyc-backend/UsersJenishaJAppDataLocalTempmrz-lines.txt
-securekyc-backend/test-mysql-creds.bat
-Kyc Dashboard/
-Kyc Dashboard - zip file.zip
+
+# Maven (apps/backend)
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+apps/backend/uploads/
+apps/backend/.db-creds.txt
+apps/backend/UsersJenishaJAppDataLocalTempmrz-lines.txt
+apps/backend/test-mysql-creds.bat
+apps/backend/.mvn/wrapper/maven-wrapper.jar
+
+# IDE / OS
+.vscode/
+.idea/
+*.iws
+*.iml
+*.ipr
+.DS_Store
+*.local
+
+# Logs
 npm-debug.log*
+*.log
+apps/backend/UsersJenishaJAppDataLocalTempmrz-lines.txt
