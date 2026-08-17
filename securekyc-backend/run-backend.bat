@@ -14,4 +14,4 @@ if "%DB_PASSWORD%"=="" (
 
 cd /d "%~dp0"
 echo Starting SecureKYC backend on port 8081...
-call mvnw.cmd spring-boot:run
+call "%~dp0mvnw.cmd" spring-boot:run

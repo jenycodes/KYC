@@ -43,6 +43,7 @@ async function request(path, options = {}) {
  * expiry is handled for every authenticated call in the app. `path` is
  * relative to the API root (e.g. "/auth/me", "/applications/mine").
  */
+
 export async function apiFetch(path, options = {}) {
   const token = getAuthToken();
   const isFormData = options.body instanceof FormData;
@@ -123,10 +124,10 @@ export async function registerUser({ fullName, email, password, confirmPassword,
   };
 }
 
-export async function loginWithPassword({ email, password, accountType }) {
+export async function loginWithPassword({ email, password }) {
   const data = await request("/login", {
     method: "POST",
-    body: JSON.stringify({ email, password, accountType }),
+    body: JSON.stringify({ email, password }),
   });
 
   return {

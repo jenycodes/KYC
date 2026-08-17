@@ -5,6 +5,12 @@ uploads/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Local secrets ###
+.env
+.env.local
+*.local.bat
+.db-creds.txt
+
 ### STS ###
 .apt_generated
 .classpath
