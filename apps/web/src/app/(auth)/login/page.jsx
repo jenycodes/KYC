@@ -8,7 +8,7 @@ import AlreadySignedIn from "../../../components/AlreadySignedIn.jsx";
 import FormField from "../../../components/FormField.jsx";
 import PasswordField from "../../../components/PasswordField.jsx";
 import { isValidLoginEmail } from "../../../utils/validators.js";
-import { getCurrentUser, homePathForRole, isAuthenticated, loginUser } from "../../../utils/caseStore.js";
+import { homePathForRole, loginUser, useCurrentUser } from "../../../utils/caseStore.js";
 import { loginWithPassword } from "../../../utils/authApi.js";
 import { consumeSessionNotice } from "../../../utils/sessionNotice.js";
 import "../../../styles/forms.css";
@@ -26,11 +26,10 @@ function LoginPage() {
   const [remember, setRemember] = useState(true);
   const [status, setStatus] = useState("idle"); // idle | loading | success | error
   const [notice, setNotice] = useState(null);
-  const [alreadySignedInUser, setAlreadySignedInUser] = useState(null);
+  const alreadySignedInUser = useCurrentUser();
 
   useEffect(() => {
     setNotice(consumeSessionNotice());
-    setAlreadySignedInUser(isAuthenticated() ? getCurrentUser() : null);
   }, []);
 
   function update(field) {
@@ -93,7 +92,6 @@ function LoginPage() {
         email: data.email,
         fullName: data.fullName,
         role: data.role,
-        token: data.token,
       });
       setStatus("success");
       router.replace(homePathForRole(user.role));

@@ -1,4 +1,4 @@
-import { getAuthToken, logoutUser } from "./caseStore.js";
+import { logoutUser } from "./caseStore.js";
 import { setSessionNotice } from "./sessionNotice.js";
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8081/api/auth";
@@ -38,14 +38,14 @@ async function request(path, options = {}) {
 }
 
 /**
- * Like request(), but attaches the current session token and, on a 401,
- * clears the session and redirects to /login — the single place session
- * expiry is handled for every authenticated call in the app. `path` is
- * relative to the API root (e.g. "/auth/me", "/applications/mine").
+ * Like request(), but sends the session cookie and, on a 401, clears the
+ * session and redirects to /login — the single place session expiry is
+ * handled for every authenticated call in the app. `path` is relative to
+ * the API root (e.g. "/auth/me", "/applications/mine"). The session itself
+ * travels as an httpOnly cookie (credentials: "include"), not a header —
+ * this code never has access to the raw token.
  */
-
 export async function apiFetch(path, options = {}) {
-  const token = getAuthToken();
   const isFormData = options.body instanceof FormData;
 
   let res;
@@ -54,7 +54,6 @@ export async function apiFetch(path, options = {}) {
       ...options,
       headers: {
         ...(isFormData ? {} : { "Content-Type": "application/json" }),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {}),
       },
       credentials: "include",
@@ -82,12 +81,9 @@ export async function apiFetch(path, options = {}) {
 
 /** Same session/401 handling as apiFetch, but returns a Blob for binary content (e.g. document previews). */
 export async function apiFetchBlob(path) {
-  const token = getAuthToken();
-
   let res;
   try {
     res = await fetch(`${API_ROOT}${path}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
       credentials: "include",
     });
   } catch {
@@ -120,7 +116,6 @@ export async function registerUser({ fullName, email, password, confirmPassword,
     email: data.email,
     fullName: data.fullName,
     role: data.role,
-    token: data.token,
   };
 }
 
@@ -134,7 +129,6 @@ export async function loginWithPassword({ email, password }) {
     email: data.email,
     fullName: data.fullName,
     role: data.role,
-    token: data.token,
   };
 }
 
@@ -149,7 +143,6 @@ export async function fetchCurrentSession() {
     email: data.email,
     fullName: data.fullName,
     role: data.role,
-    token: data.token,
   };
 }
 

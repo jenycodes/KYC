@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../../../components/AuthLayout.jsx";
@@ -8,7 +8,7 @@ import AlreadySignedIn from "../../../components/AlreadySignedIn.jsx";
 import FormField from "../../../components/FormField.jsx";
 import PasswordField from "../../../components/PasswordField.jsx";
 import { isStrongEnough, isValidEmail, isValidFullName, isValidReviewerId } from "../../../utils/validators.js";
-import { getCurrentUser, homePathForRole, isAuthenticated, loginUser } from "../../../utils/caseStore.js";
+import { homePathForRole, loginUser, useCurrentUser } from "../../../utils/caseStore.js";
 import { registerUser } from "../../../utils/authApi.js";
 import "../../../styles/forms.css";
 
@@ -27,11 +27,7 @@ function RegisterPage() {
   const [values, setValues] = useState(INITIAL);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle");
-  const [alreadySignedInUser, setAlreadySignedInUser] = useState(null);
-
-  useEffect(() => {
-    setAlreadySignedInUser(isAuthenticated() ? getCurrentUser() : null);
-  }, []);
+  const alreadySignedInUser = useCurrentUser();
 
   function update(field, isCheckbox = false) {
     return (e) => {
@@ -128,7 +124,6 @@ function RegisterPage() {
         email: data.email,
         fullName: data.fullName,
         role: data.role,
-        token: data.token,
       });
       setStatus("success");
       router.replace(homePathForRole(user.role));

@@ -1,5 +1,6 @@
 import "./globals.css";
 import ErrorBoundary from "../components/ErrorBoundary.jsx";
+import AuthBootstrap from "../components/AuthBootstrap.jsx";
 
 export const metadata = {
   title: "Secure KYC — Identity Verification",
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <AuthBootstrap />
         <ErrorBoundary>{children}</ErrorBoundary>
       </body>
     </html>

@@ -17,7 +17,8 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final long EXPIRY_MILLIS = 8 * 60 * 60 * 1000L; // 8 hours
+    public static final long EXPIRY_SECONDS = 8 * 60 * 60; // 8 hours — also used as the session cookie's Max-Age
+    private static final long EXPIRY_MILLIS = EXPIRY_SECONDS * 1000L;
 
     private final SecretKey signingKey;
 

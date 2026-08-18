@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +24,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String SESSION_SUPERSEDED_ATTR = "sessionSuperseded";
+    public static final String SESSION_COOKIE_NAME = "session_token";
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -38,11 +40,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
+        String token = extractToken(request);
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-
+        if (token != null) {
             try {
                 Claims claims = jwtService.parseClaims(token);
                 String email = claims.getSubject();
@@ -77,5 +77,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /** Prefers the Authorization header (non-browser clients); falls back to the httpOnly session cookie. */
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (SESSION_COOKIE_NAME.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 }

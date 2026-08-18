@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import RoleProtectedRoute from "../../../components/RoleProtectedRoute.jsx";
 import Sidebar from "../../../components/dashboard/Sidebar.jsx";
 import DashboardHeader from "../../../components/dashboard/DashboardHeader.jsx";
 import DashboardOverview from "../../../components/dashboard/DashboardOverview.jsx";
@@ -15,7 +14,7 @@ import VerificationChecklist from "../../../components/dashboard/VerificationChe
 import AdminUsersPanel from "../../../components/dashboard/AdminUsersPanel.jsx";
 import DecisionStep from "../../../components/verification/DecisionStep.jsx";
 import { logout as logoutOnServer } from "../../../utils/authApi.js";
-import { getCurrentUser, logoutUser } from "../../../utils/caseStore.js";
+import { logoutUser, useCurrentUser } from "../../../utils/caseStore.js";
 import {
   decideApplication,
   fetchAdminStats,
@@ -81,7 +80,7 @@ function filterCases(cases, query) {
 
 function ReviewerDashboardPage() {
   const router = useRouter();
-  const user = getCurrentUser();
+  const user = useCurrentUser();
   const isAdmin = user?.role === "ADMIN";
 
   const [applications, setApplications] = useState([]);
@@ -416,10 +415,6 @@ function ReviewerDashboardPage() {
   );
 }
 
-export default function Page() {
-  return (
-    <RoleProtectedRoute allowedRoles={["ADMIN", "OFFICER"]}>
-      <ReviewerDashboardPage />
-    </RoleProtectedRoute>
-  );
-}
+// Role gating happens in middleware.js, before this page ever renders —
+// no client-side guard needed here.
+export default ReviewerDashboardPage;

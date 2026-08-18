@@ -1,5 +1,6 @@
 package com.securekyc.securekyc_backend.controller;
 
+import com.securekyc.securekyc_backend.config.JwtAuthenticationFilter;
 import com.securekyc.securekyc_backend.dto.AuthResponse;
 import com.securekyc.securekyc_backend.dto.ForgotPasswordRequest;
 import com.securekyc.securekyc_backend.dto.LoginRequest;
@@ -11,7 +12,10 @@ import com.securekyc.securekyc_backend.repository.UserRepository;
 import com.securekyc.securekyc_backend.service.AuthService;
 import com.securekyc.securekyc_backend.service.JwtService;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +27,9 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+
+    @Value("${app.cookie.secure:false}")
+    private boolean cookieSecure;
 
     public AuthController(AuthService authService, JwtService jwtService, UserRepository userRepository) {
         this.authService = authService;
@@ -39,9 +46,11 @@ public class AuthController {
             @RequestBody RegisterRequest request) {
 
         User user = authService.register(request);
+        String token = jwtService.generateToken(user);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
+                .header(HttpHeaders.SET_COOKIE, buildSessionCookie(token).toString())
                 .body(toAuthResponse(user));
     }
 
@@ -54,8 +63,11 @@ public class AuthController {
             @RequestBody LoginRequest request) {
 
         User user = authService.login(request);
+        String token = jwtService.generateToken(user);
 
-        return ResponseEntity.ok(toAuthResponse(user));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, buildSessionCookie(token).toString())
+                .body(toAuthResponse(user));
     }
 
     // =========================
@@ -80,7 +92,9 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(Authentication authentication) {
         authService.logout(authentication.getName());
-        return ResponseEntity.ok(new SuccessResponse("Signed out."));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, clearSessionCookie().toString())
+                .body(new SuccessResponse("Signed out."));
     }
 
     // =========================
@@ -141,9 +155,35 @@ public class AuthController {
                 user.getFullName(),
                 user.getEmail(),
                 user.getEmployeeId(),
-                user.getRole().name(),
-                jwtService.generateToken(user)
+                user.getRole().name()
         );
+    }
+
+    /**
+     * httpOnly so client-side JS can never read the token (closes the
+     * XSS-can-steal-the-session gap that plain localStorage storage has).
+     * SameSite=Lax is enough since the frontend/backend share "localhost" as
+     * their site in dev; a cross-domain production deployment would need
+     * either a shared parent domain or a same-origin proxy in front of this API.
+     */
+    private ResponseCookie buildSessionCookie(String token) {
+        return ResponseCookie.from(JwtAuthenticationFilter.SESSION_COOKIE_NAME, token)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(JwtService.EXPIRY_SECONDS)
+                .build();
+    }
+
+    private ResponseCookie clearSessionCookie() {
+        return ResponseCookie.from(JwtAuthenticationFilter.SESSION_COOKIE_NAME, "")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(0)
+                .build();
     }
 
     // =========================

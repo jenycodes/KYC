@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import RoleProtectedRoute from "../../../components/RoleProtectedRoute.jsx";
 import Sidebar from "../../../components/dashboard/Sidebar.jsx";
 import DashboardHeader from "../../../components/dashboard/DashboardHeader.jsx";
 import DashboardOverview from "../../../components/dashboard/DashboardOverview.jsx";
@@ -13,7 +12,7 @@ import ProcessingIndicator from "../../../components/dashboard/ProcessingIndicat
 import DocumentReviewPanel from "../../../components/dashboard/DocumentReviewPanel.jsx";
 import UploadStep from "../../../components/verification/UploadStep.jsx";
 import { logout as logoutOnServer } from "../../../utils/authApi.js";
-import { getCurrentUser, logoutUser } from "../../../utils/caseStore.js";
+import { logoutUser, useCurrentUser } from "../../../utils/caseStore.js";
 import {
   createDraft,
   fetchDocumentPreviewUrl,
@@ -78,7 +77,7 @@ function filterCases(cases, query) {
 
 function CustomerDashboardPage() {
   const router = useRouter();
-  const user = getCurrentUser();
+  const user = useCurrentUser();
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -469,10 +468,6 @@ function CustomerDashboardPage() {
   );
 }
 
-export default function Page() {
-  return (
-    <RoleProtectedRoute allowedRoles={["CUSTOMER"]}>
-      <CustomerDashboardPage />
-    </RoleProtectedRoute>
-  );
-}
+// Role gating happens in middleware.js, before this page ever renders —
+// no client-side guard needed here.
+export default CustomerDashboardPage;

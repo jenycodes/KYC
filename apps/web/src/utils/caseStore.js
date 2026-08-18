@@ -1,7 +1,12 @@
-import { isTokenExpired } from "./session.js";
+import { useEffect, useState } from "react";
 
-const STORAGE_KEY_USER = "securekyc_user_v1";
-const STORAGE_KEY_TOKEN = "securekyc_token_v1";
+// In-memory only — deliberately not persisted (no localStorage/sessionStorage).
+// The real session lives in an httpOnly cookie this code can never read;
+// this is just non-secret display info (name/role/avatar) for the UI,
+// re-hydrated from GET /api/auth/me on every fresh page load by
+// components/AuthBootstrap.jsx. It does not survive a full reload on its
+// own — that's the point.
+let currentUser = null;
 
 const ROLE_LABELS = {
   ADMIN: "Admin",
@@ -9,29 +14,17 @@ const ROLE_LABELS = {
   CUSTOMER: "Customer",
 };
 
-export function getCurrentUser() {
-  const raw = localStorage.getItem(STORAGE_KEY_USER);
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    const user = JSON.parse(raw);
-    return user?.email ? user : null;
-  } catch {
-    return null;
-  }
-}
-
-export function getAuthToken() {
-  return localStorage.getItem(STORAGE_KEY_TOKEN);
-}
-
 function notifyAuthChange() {
-  window.dispatchEvent(new Event("securekyc-auth-change"));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("securekyc-auth-change"));
+  }
 }
 
-export function loginUser({ email, fullName = "", role, token = "" }) {
+export function getCurrentUser() {
+  return currentUser;
+}
+
+export function loginUser({ email, fullName = "", role }) {
   const normalizedEmail = String(email || "").trim();
   if (!normalizedEmail) {
     throw new Error("Sign-in response did not include an email address.");
@@ -39,13 +32,10 @@ export function loginUser({ email, fullName = "", role, token = "" }) {
   if (!role) {
     throw new Error("Sign-in response did not include an account role.");
   }
-  if (!token) {
-    throw new Error("Sign-in response did not include a session token.");
-  }
 
   const name = fullName || normalizedEmail.split("@")[0].replace(".", " ");
 
-  const user = {
+  currentUser = {
     name,
     email: normalizedEmail,
     role,
@@ -53,21 +43,52 @@ export function loginUser({ email, fullName = "", role, token = "" }) {
     avatar: name.slice(0, 2).toUpperCase(),
   };
 
-  localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
-  localStorage.setItem(STORAGE_KEY_TOKEN, token);
   notifyAuthChange();
-  return user;
+  return currentUser;
 }
 
 export function logoutUser() {
-  localStorage.removeItem(STORAGE_KEY_USER);
-  localStorage.removeItem(STORAGE_KEY_TOKEN);
+  currentUser = null;
+
+  // One-time cleanup of the pre-httpOnly-cookie design's localStorage keys,
+  // for anyone with a stale cached session from before this change.
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("securekyc_user_v1");
+    localStorage.removeItem("securekyc_token_v1");
+  }
+
   notifyAuthChange();
 }
 
+/**
+ * Best-effort, client-visible hint only — the real session lives in an
+ * httpOnly cookie this code can never read. Used purely to decide whether to
+ * show the "already signed in" nudge on /login and /register; actual route
+ * protection happens in middleware (proxy.js) and on the backend, not here.
+ */
 export function isAuthenticated() {
-  const token = getAuthToken();
-  return Boolean(getCurrentUser()) && Boolean(token) && !isTokenExpired(token);
+  return Boolean(currentUser);
+}
+
+/**
+ * React hook version of getCurrentUser() — re-renders the calling component
+ * whenever the in-memory session changes (login, logout, or the initial
+ * bootstrap hydration from the cookie). Plain getCurrentUser() is fine for
+ * one-shot checks inside effects/handlers, but anything that needs to
+ * reflect the bootstrap's async result should use this instead.
+ */
+export function useCurrentUser() {
+  const [user, setUser] = useState(currentUser);
+
+  useEffect(() => {
+    function handleChange() {
+      setUser(currentUser);
+    }
+    window.addEventListener("securekyc-auth-change", handleChange);
+    return () => window.removeEventListener("securekyc-auth-change", handleChange);
+  }, []);
+
+  return user;
 }
 
 export function homePathForRole(role) {
