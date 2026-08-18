@@ -29,9 +29,14 @@ Verification System, built with React 19 + Next.js (App Router).
 - Plain CSS with a small design-token system (`src/app/globals.css`) — no UI
   framework, so it's easy to re-skin to match the rest of the KYC document
   set (navy `#1F2A36`, blue `#3B82C4`, green `#2E9E6B`, red `#D9534F`).
-- Auth is client-side: a JWT issued by the Spring Boot backend is kept in
-  `localStorage` and attached as a `Bearer` header on every API call
-  (`src/utils/authApi.js`, `src/utils/caseStore.js`).
+- Auth: the Spring Boot backend issues the JWT as an httpOnly session
+  cookie (never readable by JS) on login/register; the browser attaches it
+  automatically on every API call (`credentials: "include"`,
+  `src/utils/authApi.js`). `src/proxy.js` (Next.js middleware) gates
+  `/reviewer`, `/customer`, `/dashboard`, `/home` server-side using that
+  cookie, before any page renders. `caseStore.js` keeps only non-secret
+  display info (name/role/avatar) in memory, re-hydrated from
+  `GET /api/auth/me` on each load by `components/AuthBootstrap.jsx`.
 
 ## Getting started
 
@@ -67,8 +72,9 @@ POST /api/auth/logout
 
 ```
 src/
+  proxy.js                   Next.js middleware: gates protected routes using the session cookie
   app/
-    layout.jsx                root layout: metadata, fonts, globals.css, ErrorBoundary
+    layout.jsx                root layout: metadata, fonts, globals.css, ErrorBoundary, AuthBootstrap
     page.jsx                  "/" -> redirects to /login
     not-found.jsx             unmatched routes -> redirect to /login
     (auth)/
@@ -77,14 +83,14 @@ src/
       forgot-password/page.jsx
       reset-password/page.jsx  (wrapped in Suspense — reads ?token=&email=)
     (protected)/
-      reviewer/page.jsx        gated by RoleProtectedRoute (ADMIN, OFFICER)
-      customer/page.jsx        gated by RoleProtectedRoute (CUSTOMER)
-    dashboard/page.jsx, home/page.jsx   role-based redirect (DashboardRedirect)
+      reviewer/page.jsx        role gating already done by proxy.js (ADMIN, OFFICER)
+      customer/page.jsx        role gating already done by proxy.js (CUSTOMER)
+    dashboard/page.jsx, home/page.jsx   role-based redirect (DashboardRedirect, fallback only — proxy.js handles the common case)
   components/
     AuthLayout.jsx / .css      shared split-screen shell
     ErrorBoundary.jsx          top-level crash screen with a "reset session" action
-    RoleProtectedRoute.jsx     client-side auth/role gate + redirect
-    DashboardRedirect.jsx      redirects "/dashboard" and "/home" by role
+    AuthBootstrap.jsx          re-hydrates the in-memory user from GET /api/auth/me on load
+    DashboardRedirect.jsx      redirects "/dashboard" and "/home" by role (fallback)
     AlreadySignedIn.jsx        shown on /login and /register when already signed in
     ScanIllustration.jsx / StaticScanIllustration.jsx
     FormField.jsx, PasswordField.jsx
@@ -96,18 +102,22 @@ src/
     authApi.js                 fetch wrapper: login/register/session/401 handling
     applicationApi.js          KYC application/case CRUD + document upload
     applicationFields.js       OCR-extracted field defs/mapping
-    caseStore.js                localStorage-backed session (user, token, role)
-    session.js                  JWT decode/expiry helpers
+    caseStore.js                in-memory session (name/role/avatar), reactive via useCurrentUser()
     sessionNotice.js            one-shot "you were signed out" banner
     validators.js                client-side form validation rules
 ```
 
 ## Notes
 
-- Auth state is entirely client-side (no cookies, no server session), so
-  every route under `(auth)` and `(protected)` is a Client Component. Only
-  `/` and the not-found page are Server Components.
-- There's no Next.js middleware-based route protection — the backend issues
-  no cookies (stateless JWT via `Authorization: Bearer`), so middleware would
-  have nothing to read. Route gating happens client-side in
-  `RoleProtectedRoute`, same as the previous React Router implementation.
+- The real session credential is an httpOnly cookie (`session_token`) —
+  never readable by JS, closing the XSS-can-steal-the-token gap plain
+  `localStorage` storage would have. `proxy.js` reads it server-side to gate
+  `/reviewer`, `/customer`, `/dashboard`, `/home` before any page renders,
+  so there's no client-side blank-flash-then-redirect.
+- Everything under `(auth)`/`(protected)` is still a Client Component — the
+  dashboards themselves are inherently per-user/dynamic, and `caseStore.js`'s
+  in-memory display info is only readable client-side. Only `/` and the
+  not-found page are Server Components.
+- `DashboardRedirect.jsx` (used by `/dashboard`, `/home`) is a fallback, not
+  the primary path — `proxy.js` already redirects those before the page
+  loads in the normal case.
